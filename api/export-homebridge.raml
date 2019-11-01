@@ -1,0 +1,14 @@
+#%RAML 1.0
+title: export-homebridge
+version: v1
+baseUri: http://localhost:8111/api/{version}
+/qrcode: 
+    displayName: QRcode Resource
+    description: Example - http://localhost:8111/homebridge/qrcode
+    get: 
+        description: Get the qrcode of homebridge
+        responses: 
+            "200": 
+                description: The qrcode is acquired.
+            "500": 
+                description: wrong format.
