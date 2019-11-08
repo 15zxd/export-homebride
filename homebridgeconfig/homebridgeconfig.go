@@ -34,15 +34,16 @@ type Platform struct {
 	ConfigPath  string      `json:"configPath"`
 	Platform    string      `json:"platform"`
 }
+
 //omitempty的注释:1、加上omitempty如果dimmerable为nil，则生成的dimmerable不会显示""；2、不加omitempty则如果dimmerable为nil，生成的dimmerable会显示""；
 type Accessary struct {
 	Service    string `json:"service"`
-	Name       string `json:"name"`  //这个Name是alias
+	Name       string `json:"name"`     //这个Name是alias
 	ProxyID    string `json:"proxy_id"` //ProxyID是deviceID
 	Accessory  string `json:"accessory"`
 	Dimmerable string `json:"dimmerable,omitempty"`
 	Modes      string `json:"modes,omitempty"`
-	Fanlevels  string `json:"fanlevels,omitempty"`
+	//Fanlevels  string `json:"fanlevels,omitempty"`
 }
 
 //Envelope means the data transformed from coremetadata
@@ -53,28 +54,24 @@ type Envelope []struct {
 }
 type Profile struct {
 	Name     string
-	Commands []Commands
+	Commands []Command
 }
 
-//Command means control
-type Commands struct {
-	ID   string  //注:ID是指commandid
-	Name string  //注:Name是指虚拟设备的一些特征值，诸如:onoff fanlevel ttarget mode brightness percent moving等
-}
 type Accessarysender struct {
 	Service  string
-	Name     string  //注:Name是指真实的name
-	ID       string  //注:ID是指deviceid
-	Commands []Commands
+	Name     string //注:Name是指真实的name
+	ID       string //注:ID是指deviceid
+	Commands []Command
 }
+
 //ha-project新加的
 type Response struct {
 	Cached bool            `json:"cached"`
 	Data   []VirtualDevice `json:"data"`
 }
 
-var Pincode          string
-var Accessaries      []Accessary
+var Pincode string
+var Accessaries []Accessary
 var Accessarysenders []Accessarysender
 
 func changeNameUponConflict(tempAccessaries []Accessary, oldname string) (name string) {
@@ -98,11 +95,11 @@ name相同时则对应的虚拟设备的alias就会相同，这个函数就保�
 (2)、(3)....等等表示)，就是下方的的index := 1；2、homekit上的虚拟设备如果是调光灯在控制的时候就显示百分百，如果是开关灯在控制
 的时候就显示开和关；3、指定homebridge的config.json文件的生成路径；*/
 func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) error {
-	var tempAccessaries      []Accessary
+	var tempAccessaries []Accessary
 	var tempAccessarysenders []Accessarysender
-	var accessarysender      Accessarysender
+	var accessarysender Accessarysender
 
-	var lightResponse  Response
+	var lightResponse Response
 	var lightaccessary Accessary
 	err := json.Unmarshal(light, &lightResponse) //对light设备进行json非序列化动作，有err返回err
 	if err != nil {
@@ -135,8 +132,8 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 			} else if projectcommand.Name == "dimmerable" { //如果projectcommand.Name == "dimmerable"，则直接赋值accessary.Dimmerable = projectcommand.Value，
 				lightaccessary.Dimmerable = projectcommand.Value // 注config.json中accessaries中只有proxy_id、name、dimmerable是需要从52030获取的，其它都是edgex分配的
 			}
-			var command Commands
-			command.ID = projectcommand.Id
+			var command Command
+			command.ID = projectcommand.ID
 			command.Name = projectcommand.Name
 			commands = append(commands, command)
 		}
@@ -149,7 +146,7 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 	common.Log.Info("lightAccessars: ", tempAccessaries)
 	common.Log.Info("light: ", accessarysender)
 
-	var curtainResponse  Response
+	var curtainResponse Response
 	var curtainaccessary Accessary
 	err = json.Unmarshal(curtain, &curtainResponse)
 	if !curtainResponse.Cached {
@@ -178,8 +175,8 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 			if projectcommand.Name == "alias" {
 				curtainaccessary.Name = changeNameUponConflict(tempAccessaries, projectcommand.Value)
 			}
-			var command Commands
-			command.ID = projectcommand.Id
+			var command Command
+			command.ID = projectcommand.ID
 			command.Name = projectcommand.Name
 			commands = append(commands, command)
 		}
@@ -192,7 +189,7 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 	common.Log.Info("curtainAccessars: ", tempAccessaries)
 	common.Log.Info("curtain: ", accessarysender)
 
-	var hvacResponse  Response
+	var hvacResponse Response
 	var hvacaccessary Accessary
 	err = json.Unmarshal(hvac, &hvacResponse)
 	if !hvacResponse.Cached {
@@ -222,11 +219,11 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 				hvacaccessary.Name = changeNameUponConflict(tempAccessaries, projectcommand.Value)
 			} else if projectcommand.Name == "modes" {
 				hvacaccessary.Modes = projectcommand.Value
-			} else if projectcommand.Name == "fanlevels" {
-				hvacaccessary.Fanlevels = projectcommand.Value
-			}
-			var command Commands
-			command.ID = projectcommand.Id
+			} //else if projectcommand.Name == "fanlevels" {
+			//hvacaccessary.Fanlevels = projectcommand.Value
+			//}
+			var command Command
+			command.ID = projectcommand.ID
 			command.Name = projectcommand.Name
 			commands = append(commands, command)
 		}
@@ -304,4 +301,3 @@ func createConfigData(accessaries []Accessary, statusport string) (configdata Au
 	}
 	return
 }
-
