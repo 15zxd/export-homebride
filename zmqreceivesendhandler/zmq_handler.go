@@ -188,28 +188,65 @@ func ZmqInit() error {
 
 func sendVirtualDevice(device homebridgeconfig.Accessarysender) {
 	status := make(map[string]interface{})
-
+	common.Log.Info(device.Commands)
 	if device.Service == "Lightbulb" {
-		var dimmerablelightstatus DimmerableLightStatus
-		var brightnessValue string
+
+		var dimmerableValue string
 		for _, command := range device.Commands {
-			if command.Name == "brightness" {
-				brightnessValue = command.Value
+			if command.Name == "dimmerable" {
+				dimmerableValue = command.Value
 				break
 			}
 		}
-		dimmerablelightstatus.Characteristic.Brightness, _ = strconv.Atoi(brightnessValue)
-		if dimmerablelightstatus.Characteristic.Brightness > 0 {
-			dimmerablelightstatus.Characteristic.On = true
-		} else {
-			dimmerablelightstatus.Characteristic.On = false
+
+		if dimmerableValue == "true" {
+			var dimmerablelightstatus DimmerableLightStatus
+			var brightnessValue string
+			for _, command := range device.Commands {
+				if command.Name == "brightness" {
+					brightnessValue = command.Value
+					break
+				}
+			}
+
+			dimmerablelightstatus.Characteristic.Brightness, _ = strconv.Atoi(brightnessValue)
+			if dimmerablelightstatus.Characteristic.Brightness > 0 {
+				dimmerablelightstatus.Characteristic.On = true
+			} else {
+				dimmerablelightstatus.Characteristic.On = false
+			}
+
+			dimmerablelightstatus.Id = device.ID
+			dimmerablelightstatus.Name = device.Name
+			dimmerablelightstatus.Service = device.Service
+			common.Log.Info(dimmerablelightstatus)
+			status["status"] = dimmerablelightstatus
 		}
 
-		dimmerablelightstatus.Id = device.ID
-		dimmerablelightstatus.Name = device.Name
-		dimmerablelightstatus.Service = device.Service
-		common.Log.Info(dimmerablelightstatus)
-		status["status"] = dimmerablelightstatus
+		if dimmerableValue == "false" {
+			var lightStatus LightStatus
+			var onoffValue string
+			for _, command := range device.Commands {
+				if command.Name == "onoff" {
+					onoffValue = command.Value
+					break
+				}
+			}
+
+			if onoffValue == "true" {
+				lightStatus.Characteristic.On = true
+			}
+			if onoffValue == "false" {
+				lightStatus.Characteristic.On = false
+			}
+
+			lightStatus.Id = device.ID
+			lightStatus.Name = device.Name
+			lightStatus.Service = device.Service
+			common.Log.Info(lightStatus)
+			status["status"] = lightStatus
+		}
+
 	}
 
 	if device.Service == "WindowCovering" {

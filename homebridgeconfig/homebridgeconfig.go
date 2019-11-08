@@ -113,18 +113,7 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 		lightaccessary.ProxyID = virtualDevice.Id //将虚拟设备的Id赋值给accessary.ProxyID，注Id是从edgex分配来的
 		lightaccessary.Accessory = "Control4"     //对accessary.Service、accessary.Accessory进行字符串赋值，以上这些都是config.json文件中的
 		lightaccessary.Service = "Lightbulb"
-		commands := accessarysender.Commands
-		valid := true
-		for _, projectcommand := range virtualDevice.Commands {
-			if projectcommand.Value == "" && projectcommand.Name == "alias" {
-				valid = false
-				break
-			}
-		}
-		if !valid {
-			common.Log.Info("过滤该虚拟设备")
-			continue
-		}
+		commands := []Command{}
 		//这个for循环用在web上的zigbee设备的name如果相同则对应的虚拟设备灯光的alias也相同，这是在后面加上(1、2、3....)以示区分
 		for _, projectcommand := range virtualDevice.Commands {
 			if projectcommand.Name == "alias" { //若projectcommand.Name等于alias则去遍历从52030获取的所有light的ailas，看是否有相同的
@@ -162,17 +151,8 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 		curtainaccessary.ProxyID = project.Id
 		curtainaccessary.Accessory = "Control4"
 		curtainaccessary.Service = "WindowCovering"
-		commands := accessarysender.Commands
-		valid := true
-		for _, projectcommand := range project.Commands {
-			if projectcommand.Value == "" && projectcommand.Name == "alias" {
-				valid = false
-				break
-			}
-		}
-		if valid == false {
-			continue
-		}
+		commands := []Command{}
+
 		for _, projectcommand := range project.Commands {
 			if projectcommand.Name == "alias" {
 				curtainaccessary.Name = changeNameUponConflict(tempAccessaries, projectcommand.Value)
@@ -208,17 +188,8 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 		hvacaccessary.ProxyID = project.Id
 		hvacaccessary.Accessory = "Control4"
 		hvacaccessary.Service = "Thermostat"
-		commands := accessarysender.Commands
-		valid := true
-		for _, projectcommand := range project.Commands {
-			if projectcommand.Value == "" && projectcommand.Name == "alias" {
-				valid = false
-				break
-			}
-		}
-		if valid == false {
-			continue
-		}
+		commands := []Command{}
+
 		for _, projectcommand := range project.Commands {
 			if projectcommand.Name == "alias" {
 				hvacaccessary.Name = changeNameUponConflict(tempAccessaries, projectcommand.Value)
