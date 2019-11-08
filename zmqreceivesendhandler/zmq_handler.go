@@ -179,7 +179,10 @@ func ZmqInit() error {
 				//	}
 				//}
 			}
+		} else {
+			getEdgexParams(commandzmq)
 		}
+
 	}
 }
 
@@ -221,6 +224,8 @@ func sendVirtualDevice(device homebridgeconfig.Accessarysender) {
 		_, err = newPublisher.SendMessage("status", data)
 	}
 }
+
+// 把homebridge发过来的指令转发给 edgex
 func getEdgexParams(commandzmq CommandZmq) {
 	commandname := ""
 	id := commandzmq.ID
