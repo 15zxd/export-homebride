@@ -141,6 +141,7 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 		accessarysender.Commands = commands
 		accessarysender.Name = virtualDevice.Name
 		accessarysender.ID = virtualDevice.Id
+		accessarysender.Service = "Lightbulb"
 		tempAccessaries = append(tempAccessaries, lightaccessary)
 		tempAccessarysenders = append(tempAccessarysenders, accessarysender) //store deviceid and commandid
 	}
@@ -184,6 +185,7 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 		accessarysender.Commands = commands
 		accessarysender.Name = project.Name
 		accessarysender.ID = project.Id
+		accessarysender.Service = "WindowCovering"
 		tempAccessaries = append(tempAccessaries, curtainaccessary)
 		tempAccessarysenders = append(tempAccessarysenders, accessarysender) //store deviceid and commandid
 	}
@@ -231,6 +233,7 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 		accessarysender.Commands = commands
 		accessarysender.Name = project.Name
 		accessarysender.ID = project.Id
+		accessarysender.Service = "Thermostat"
 		tempAccessaries = append(tempAccessaries, hvacaccessary)
 		tempAccessarysenders = append(tempAccessarysenders, accessarysender) //store deviceid and commandid
 	}
