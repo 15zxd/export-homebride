@@ -189,11 +189,8 @@ func ZmqInit() error {
 func sendVirtualDevice(device homebridgeconfig.Accessarysender) {
 	status := make(map[string]interface{})
 
-	var dimmerablelightstatus DimmerableLightStatus
-	//var curtainstatus CurtainStatus
-	//var lightstatus LightStatus
-	//var hvacstatus HvacStatus
 	if device.Service == "Lightbulb" {
+		var dimmerablelightstatus DimmerableLightStatus
 		var brightnessValue string
 		for _, command := range device.Commands {
 			if command.Name == "brightness" {
@@ -208,13 +205,55 @@ func sendVirtualDevice(device homebridgeconfig.Accessarysender) {
 			dimmerablelightstatus.Characteristic.On = false
 		}
 		dimmerablelightstatus.Id = device.ID
-
 		dimmerablelightstatus.Name = device.Name
 		dimmerablelightstatus.Service = device.Service
 		common.Log.Info(dimmerablelightstatus)
 		status["status"] = dimmerablelightstatus
 	}
 
+	if device.Service == "WindowCovering" {
+		var curtainstatus CurtainStatus
+		var percentValue string
+		for _, command := range device.Commands {
+			if command.Name == "percent" {
+				percentValue = command.Value
+				break
+			}
+		}
+		curtainstatus.Characteristic.Percent, _ = strconv.Atoi(percentValue)
+		curtainstatus.Id = device.ID
+		curtainstatus.Name = device.Name
+		curtainstatus.Service = device.Service
+		common.Log.Info(curtainstatus)
+		status["status"] = curtainstatus
+	}
+
+	if device.Service == "Thermostat" {
+		var hvacstatus HvacStatus
+
+		var ttargetValue string
+		for _, command := range device.Commands {
+			if command.Name == "ttarget" {
+				ttargetValue = command.Value
+				break
+			}
+		}
+		hvacstatus.Characteristic.T_target, _ = strconv.Atoi(ttargetValue)
+
+		var modeValue string
+		for _, command := range device.Commands {
+			if command.Name == "mode" {
+				modeValue = command.Value
+				break
+			}
+		}
+		hvacstatus.Characteristic.Mode = modeValue
+		hvacstatus.Id = device.ID
+		hvacstatus.Name = device.Name
+		hvacstatus.Service = device.Service
+		common.Log.Info(hvacstatus)
+		status["status"] = hvacstatus
+	}
 	data, err := json.MarshalIndent(status, "", " ")
 	if err != nil {
 		common.Log.Errorf("EventHanler(bd string) data json.MarshalIndent failed: %v", err)
