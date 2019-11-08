@@ -161,8 +161,7 @@ func ZmqInit() error {
 			//	return errors.QRCodeAssertErr
 			//}
 			//QRcode = value
-			for i := range homebridgeconfig.Accessarysenders {
-				device := homebridgeconfig.Accessarysenders[i]
+			for _, device := range homebridgeconfig.Accessarysenders {
 				sendVirtualDevice(device)
 				//for n := range homebridgeconfig.Accessarysenders[i].Commands {
 				//	var commandID = homebridgeconfig.Accessarysenders[i].Commands[n].ID
@@ -206,15 +205,10 @@ func sendVirtualDevice(device homebridgeconfig.Accessarysender) {
 			dimmerablelightstatus.Characteristic.On = false
 		}
 		dimmerablelightstatus.Id = device.ID
-		var aliasValue string
-		for _, command := range device.Commands {
-			if command.Name == "alias" {
-				aliasValue = command.Value
-				break
-			}
-		}
-		dimmerablelightstatus.Name = aliasValue
+
+		dimmerablelightstatus.Name = device.Name
 		dimmerablelightstatus.Service = device.Service
+		common.Log.Info(dimmerablelightstatus)
 		status["status"] = dimmerablelightstatus
 	}
 
