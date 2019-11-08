@@ -204,6 +204,7 @@ func sendVirtualDevice(device homebridgeconfig.Accessarysender) {
 		} else {
 			dimmerablelightstatus.Characteristic.On = false
 		}
+
 		dimmerablelightstatus.Id = device.ID
 		dimmerablelightstatus.Name = device.Name
 		dimmerablelightstatus.Service = device.Service
@@ -221,6 +222,7 @@ func sendVirtualDevice(device homebridgeconfig.Accessarysender) {
 			}
 		}
 		curtainstatus.Characteristic.Percent, _ = strconv.Atoi(percentValue)
+
 		curtainstatus.Id = device.ID
 		curtainstatus.Name = device.Name
 		curtainstatus.Service = device.Service
@@ -230,7 +232,6 @@ func sendVirtualDevice(device homebridgeconfig.Accessarysender) {
 
 	if device.Service == "Thermostat" {
 		var hvacstatus HvacStatus
-
 		var ttargetValue string
 		for _, command := range device.Commands {
 			if command.Name == "ttarget" {
@@ -248,6 +249,7 @@ func sendVirtualDevice(device homebridgeconfig.Accessarysender) {
 			}
 		}
 		hvacstatus.Characteristic.Mode = modeValue
+
 		hvacstatus.Id = device.ID
 		hvacstatus.Name = device.Name
 		hvacstatus.Service = device.Service

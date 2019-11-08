@@ -180,6 +180,8 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 			var command Command
 			command.ID = projectcommand.ID
 			command.Name = projectcommand.Name
+			command.Value = projectcommand.Value
+
 			commands = append(commands, command)
 		}
 		accessarysender.Commands = commands
@@ -228,6 +230,7 @@ func GenerateHomebridgeConfig(light, curtain, hvac []byte, statusport string) er
 			var command Command
 			command.ID = projectcommand.ID
 			command.Name = projectcommand.Name
+			command.Value = projectcommand.Value
 			commands = append(commands, command)
 		}
 		accessarysender.Commands = commands
